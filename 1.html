@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>極限綠茵：少年梅西力學與健康特訓</title>
+    <!-- 引入 Tailwind CSS 提供冷色調科技感排版 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Font Awesome 提供圖示 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* 深冷調翡翠綠足球場背景 */
+        .soccer-field {
+            background-color: #0f3421;
+            background-image: 
+                /* 禁區半圓弧與中線 */
+                radial-gradient(circle at 50% 100%, transparent 120px, rgba(165, 243, 252, 0.25) 120px, rgba(165, 243, 252, 0.25) 122px, transparent 122px),
+                linear-gradient(to right, rgba(165, 243, 252, 0.15) 2px, transparent 2px),
+                /* 深淺條紋草皮（冷綠色調） */
+                linear-gradient(90deg, #0f3421 50%, #14442b 50%);
+            background-size: 100% 100%, 100% 100%, 14% 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 踢球動作動畫 */
+        @keyframes kick-action {
+            0% { transform: scaleX(1); }
+            20% { transform: rotate(-18deg) translateX(-8px); }
+            40% { transform: rotate(15deg) translateX(12px); }
+            100% { transform: scaleX(1); }
+        }
+        .kick-anim {
+            animation: kick-action 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
+        }
+
+        /* 進球文字特效（冷色調青藍色系） */
+        @keyframes text-bounce {
+            0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+            50% { transform: scale(1.3) rotate(8deg); opacity: 1; }
+            70% { transform: scale(0.97) rotate(-3deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        .text-active {
+            animation: text-bounce 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
+        }
+
+        /* 漂浮粒子 */
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            border-radius: 50%;
+            animation: particle-up 0.8s ease-out forwards;
+        }
+        @keyframes particle-up {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--x), var(--y)) scale(0); opacity: 0; }
+        }
+        
+        .touch-none {
+            touch-action: none;
+        }
+
+        /* 冷色系捲動條 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #06b6d4;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #0891b2;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans overflow-x-hidden select-none">
+
+    <nav class="bg-slate-900/90 backdrop-blur-md border-b border-cyan-500/20 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center gap-2">
+                    <span class="p-2 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl text-white shadow-lg shadow-cyan-500/10">
+                        <i class="fa-solid fa-compass-drafting text-lg"></i>
+                    </span>
+                    <span class="text-lg font-black tracking-wider bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                        LEGEND ACADEMY
+                    </span>
+                </div>
+                <!-- 繁體中文導覽標籤 -->
+                <div class="flex gap-1 md:gap-2">
+                    <button onclick="switchTab('pitch')" id="nav-pitch" class="nav-btn px-2 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-bold rounded-xl transition-all duration-200 bg-cyan-600 text-white shadow-md shadow-cyan-500/20">
+                        <i class="fa-solid fa-gamepad mr-1"></i>訓練場
+                    </button>
+                    <button onclick="switchTab('physics')" id="nav-physics" class="nav-btn px-2 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-bold rounded-xl transition-all duration-200 text-slate-400 hover:text-white hover:bg-white/5">
+                        <i class="fa-solid fa-flask mr-1"></i>力學教室
+                    </button>
+                    <button onclick="switchTab('health')" id="nav-health" class="nav-btn px-2 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-bold rounded-xl transition-all duration-200 text-slate-400 hover:text-white hover:bg-white/5">
+                        <i class="fa-solid fa-heart-pulse mr-1"></i>運動健康
+                    </button>
+                    <button onclick="switchTab('quiz')" id="nav-quiz" class="nav-btn px-2 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-bold rounded-xl transition-all duration-200 text-slate-400 hover:text-white hover:bg-white/5">
+                        <i class="fa-solid fa-circle-question mr-1"></i>大師測驗
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="tab-pitch" class="tab-content min-h-[calc(100vh-4rem)] flex flex-col justify-between items-center relative soccer-field p-4">
+        <!-- 上方控制資訊 -->
+        <div class="w-full max-w-4xl flex justify-between items-start z-30">
+            <!-- 繁體中文操作提示 -->
+            <div class="bg-slate-900/85 backdrop-blur-md px-4 py-3 rounded-2xl border border-cyan-500/20 max-w-[190px] sm:max-w-md shadow-2xl">
+                <h1 class="text-sm sm:text-lg font-extrabold text-cyan-400 flex items-center gap-1.5">
+                    <i class="fa-solid fa-person-running"></i> 15歲梅西少年：控球挑戰
+                </h1>
+                <p class="text-[10px] sm:text-xs text-slate-300 mt-1 leading-relaxed hidden sm:block">
+                    本角色採用 <span class="text-yellow-400 font-bold">1:7 少年梅西經典體型</span> 繪製！
+                    <br>使用鍵盤 <span class="bg-cyan-500 text-slate-950 px-1.5 py-0.5 rounded font-mono font-bold text-[10px]">WASD / 方向鍵</span> 流暢奔跑，碰觸足球即會觸發精準弧線抽射！
+                </p>
+                <p class="text-[10px] sm:text-xs text-slate-300 mt-1 sm:hidden">
+                    滑動左下角搖桿，引導梅西少年進行盤帶抽射！
+                </p>
+            </div>
+
+            <!-- 右上角冷色調計分板 -->
+            <div class="bg-slate-900/90 backdrop-blur-md border-2 border-cyan-500 p-3 sm:p-4 rounded-2xl shadow-2xl flex gap-4 sm:gap-6 text-center">
+                <div>
+                    <div class="text-[10px] sm:text-xs uppercase tracking-wider text-cyan-400 font-bold">進球數</div>
+                    <div id="score" class="text-3xl sm:text-5xl font-black text-white transition-all duration-200">0</div>
+                </div>
+                <div class="w-[1px] bg-slate-800 self-stretch"></div>
+                <div>
+                    <div class="text-[10px] sm:text-xs uppercase tracking-wider text-slate-400 font-bold">射門次數</div>
+                    <div id="shots" class="text-3xl sm:text-5xl font-black text-slate-300">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 球門與球網區域 -->
+        <div class="absolute top-[18%] left-1/2 transform -translate-x-1/2 w-[85%] max-w-xl aspect-[3.5/1] flex justify-center items-end z-10">
+            <div id="goalpost" class="w-full h-full relative border-b-4 border-cyan-500/20">
+                <svg viewBox="0 0 600 170" class="w-full h-full" xmlns="http://www.w3.org/2000/svg">
+                    <!-- 球門網 -->
+                    <defs>
+                        <pattern id="net-pattern-2" width="8" height="8" patternUnits="userSpaceOnUse">
+                            <path d="M 8 0 L 0 8 M 0 0 L 8 8" fill="none" stroke="rgba(103, 232, 249, 0.2)" stroke-width="1"/>
+                        </pattern>
+                    </defs>
+                    <rect x="50" y="10" width="500" height="160" fill="url(#net-pattern-2)" />
+                    <!-- 球門白色框架 -->
+                    <path d="M 45 170 L 45 10 L 555 10 L 555 170" fill="none" stroke="#e2e8f0" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+                    <!-- 球網後方支撐架 -->
+                    <path d="M 45 10 L 25 170 M 555 10 L 575 170" fill="none" stroke="rgba(103, 232, 249, 0.25)" stroke-width="2" stroke-dasharray="4,4" />
+                </svg>
+
+                <!-- 浮動回饋文字 -->
+                <div id="feedback-container" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 transition-opacity z-20">
+                    <span id="feedback-text" class="text-3xl sm:text-6xl font-black tracking-widest drop-shadow-[0_4px_8px_rgba(6,182,212,0.6)]"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 15歲梅西形象少年 (手部不被剪裁、四肢健全、動漫比例) -->
+        <div id="soccer-boy" class="absolute w-14 h-40 z-20 origin-bottom pointer-events-none transition-transform duration-75" style="left: 50%; top: 70%; transform: translate(-50%, -100%);">
+            <div class="relative w-full h-full">
+                <!-- 活力少年身體部件 (1:7 纖細修長動漫比例) -->
+                <div id="boy-body-wrapper" class="absolute inset-0 flex flex-col items-center">
+                    
+                    <!-- 1. 頭部 (梅西風帥氣短髮) -->
+                    <div class="relative w-7 h-7 mt-1">
+                        <!-- 腦後與側邊髮流 -->
+                        <div class="absolute -top-1 -left-1 w-9 h-8 bg-neutral-900 rounded-t-full rounded-b-md"></div>
+                        <!-- 臉部與五官 -->
+                        <div class="absolute inset-0 bg-orange-50 rounded-full border border-orange-100 overflow-hidden">
+                            <!-- 藍色運動頭帶 -->
+                            <div class="absolute top-0 left-0 right-0 h-1.5 bg-cyan-600"></div>
+                            <!-- 東方專注大眼睛 -->
+                            <div class="absolute top-2.5 left-1.5 w-1.5 h-2 bg-neutral-800 rounded-full flex items-center justify-center">
+                                <div class="w-0.5 h-0.5 bg-white rounded-full -mt-0.5 -ml-0.5"></div>
+                            </div>
+                            <div class="absolute top-2.5 right-1.5 w-1.5 h-2 bg-neutral-800 rounded-full flex items-center justify-center">
+                                <div class="w-0.5 h-0.5 bg-white rounded-full -mt-0.5 -ml-0.5"></div>
+                            </div>
+                            <!-- 自信嘴角 -->
+                            <div class="absolute bottom-1.5 left-1/2 transform -translate-x-1/2 w-2 h-0.5 border-b border-amber-950 rounded-b-full"></div>
+                        </div>
+                        <!-- 前額劉海 -->
+                        <div class="absolute -top-0.5 left-0 w-8 h-3.5 bg-neutral-900 rounded-b-sm transform -rotate-3"></div>
+                    </div>
+
+                    <!-- 脖子 -->
+                    <div class="w-2 h-2 bg-orange-50 z-10"></div>
+
+                    <!-- 2. 藍白條紋球衣與手臂 (手部移出 overflow-hidden 衣服外部，完整呈現手臂起點與小手掌) -->
+                    <div class="relative w-9 h-12 flex items-center justify-center">
+                        
+                        <!-- 左手臂 (健全、位於球衣外面、具備小手掌，擺動自如不被裁剪) -->
+                        <div id="left-arm" class="absolute -left-2 top-0.5 w-2.5 h-9 origin-top flex flex-col items-center z-10 transition-transform">
+                            <!-- 袖口 -->
+                            <div class="w-2.5 h-3 bg-cyan-400 rounded-t-sm"></div>
+                            <!-- 皮膚手臂 -->
+                            <div class="w-1.5 h-5 bg-orange-50 -mt-0.5"></div>
+                            <!-- 健全、高對比的精緻小手掌 -->
+                            <div class="w-2.5 h-2.5 bg-orange-50 rounded-full -mt-0.5 border border-orange-100/60 shadow-sm"></div>
+                        </div>
+                        
+                        <!-- 右手臂 (健全、位於球衣外面、具備小手掌，擺動自如不被裁剪) -->
+                        <div id="right-arm" class="absolute -right-2 top-0.5 w-2.5 h-9 origin-top flex flex-col items-center z-10 transition-transform">
+                            <!-- 袖口 -->
+                            <div class="w-2.5 h-3 bg-cyan-400 rounded-t-sm"></div>
+                            <!-- 皮膚手臂 -->
+                            <div class="w-1.5 h-5 bg-orange-50 -mt-0.5"></div>
+                            <!-- 健全、高對比的精緻小手掌 -->
+                            <div class="w-2.5 h-2.5 bg-orange-50 rounded-full -mt-0.5 border border-orange-100/60 shadow-sm"></div>
+                        </div>
+
+                        <!-- 球衣主體 (獨立裁切藍白相間 10 號條紋) -->
+                        <div class="w-full h-full bg-white rounded-t-sm border-x border-slate-300 flex flex-col items-center justify-start overflow-hidden shadow-md z-20">
+                            <!-- 經典藍白條紋 -->
+                            <div class="absolute inset-y-0 left-1 w-2.5 bg-cyan-400"></div>
+                            <div class="absolute inset-y-0 right-1 w-2.5 bg-cyan-400"></div>
+                            <div class="absolute inset-y-0 left-1/2 transform -translate-x-1/2 w-2 bg-cyan-400"></div>
+                            
+                            <!-- 10 號數字 -->
+                            <div class="text-slate-950 font-black text-[10px] tracking-tighter mt-1.5 z-10 drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]">10</div>
+                        </div>
+                    </div>
+
+                    <!-- 3. 黑色運動短褲 -->
+                    <div class="w-9 h-4.5 bg-zinc-900 border-t border-zinc-800 flex justify-around px-0.5 rounded-b-sm shadow z-20">
+                        <div class="w-4 h-full bg-zinc-900 border-r border-zinc-950"></div>
+                        <div class="w-4 h-full bg-zinc-900 border-l border-zinc-950"></div>
+                    </div>
+
+                    <!-- 4. 健全的大腿小腿與黃金戰靴 -->
+                    <div class="w-7 h-15 flex justify-between px-0.5 -mt-0.5 z-20">
+                        <!-- 左腿 -->
+                        <div id="left-leg" class="w-2.5 h-full bg-orange-50 flex flex-col items-center origin-top">
+                            <!-- 藍白長襪 -->
+                            <div class="w-full h-10 bg-white border-t-2 border-cyan-400 mt-1"></div>
+                            <!-- 黃金戰靴 -->
+                            <div class="w-4 h-2.5 bg-yellow-400 rounded-r-full -ml-0.5 mt-auto shadow border-b border-yellow-600"></div>
+                        </div>
+                        <!-- 右腿 -->
+                        <div id="right-leg" class="w-2.5 h-full bg-orange-50 flex flex-col items-center origin-top">
+                            <!-- 藍白長襪 -->
+                            <div class="w-full h-10 bg-white border-t-2 border-cyan-400 mt-1"></div>
+                            <!-- 黃金戰靴 -->
+                            <div class="w-4 h-2.5 bg-yellow-400 rounded-r-full -ml-0.5 mt-auto shadow border-b border-yellow-600"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- 足球 (冷白鋼鐵科技質感) -->
+        <div id="active-ball" class="absolute w-7 h-7 z-20 pointer-events-none transform -translate-x-1/2 -translate-y-1/2" style="left: 55%; top: 60%;">
+            <svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-[0_3px_5px_rgba(6,182,212,0.4)]">
+                <circle cx="50" cy="50" r="48" fill="#f1f5f9" stroke="#0f172a" stroke-width="4"/>
+                <polygon points="50,30 35,41 41,58 59,58 65,41" fill="#334155"/>
+                <path d="M 50 30 L 50 2" stroke="#334155" stroke-width="4"/>
+                <path d="M 35 41 L 10 33" stroke="#334155" stroke-width="4"/>
+                <path d="M 41 58 L 25 80" stroke="#334155" stroke-width="4"/>
+                <path d="M 59 58 L 75 80" stroke="#334155" stroke-width="4"/>
+                <path d="M 65 41 L 90 33" stroke="#334155" stroke-width="4"/>
+            </svg>
+        </div>
+
+        <!-- 旁邊備用的三顆足球 -->
+        <div class="absolute bottom-6 right-8 flex gap-1.5 z-10 opacity-60 scale-75 pointer-events-none">
+            <div class="w-7 h-7 relative transform rotate-12">
+                <svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="48" fill="#94a3b8" stroke="#334155" stroke-width="4"/></svg>
+            </div>
+            <div class="w-7 h-7 relative transform -rotate-45 translate-y-1">
+                <svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="48" fill="#94a3b8" stroke="#334155" stroke-width="4"/></svg>
+            </div>
+            <div class="w-7 h-7 relative transform rotate-[70deg] -translate-y-1">
+                <svg viewBox="0 0 100 100" class="w-full h-full"><circle cx="50" cy="50" r="48" fill="#94a3b8" stroke="#334155" stroke-width="4"/></svg>
+            </div>
+        </div>
+
+        <!-- 螢幕虛擬搖桿 (藍綠冷色系) -->
+        <div id="joystick-zone" class="absolute bottom-6 left-6 w-24 h-24 bg-slate-900/60 backdrop-blur-md rounded-full border border-cyan-500/30 flex items-center justify-center z-40 touch-none">
+            <div id="joystick-knob" class="w-8 h-8 bg-cyan-500/80 rounded-full shadow-lg shadow-cyan-500/20 transition-transform duration-75 pointer-events-none"></div>
+        </div>
+
+        <!-- 底部提示 -->
+        <div class="w-full max-w-md mb-2 z-10 flex flex-col items-center gap-1 pointer-events-none">
+            <div class="text-[10px] sm:text-xs text-cyan-400/70 flex items-center gap-1.5 bg-slate-900/50 px-3 py-1.5 rounded-full border border-cyan-500/10">
+                <span class="inline-block w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                操控方向鍵或左下搖桿跑向足球，即會觸發精采射門！
+            </div>
+        </div>
+    </div>
+
+    <!-- 主區塊：力學教室 -->
+    <div id="tab-physics" class="tab-content hidden min-h-[calc(100vh-4rem)] bg-slate-900 p-4 sm:p-8">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- 左側力學核心知識 -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+                <div class="bg-slate-800/60 border border-cyan-500/20 p-6 rounded-3xl shadow-xl">
+                    <span class="text-xs font-bold text-cyan-400 uppercase tracking-widest block mb-1">Physics of Football</span>
+                    <h2 class="text-2xl font-black mb-3 text-white flex items-center gap-2">
+                        <i class="fa-solid fa-atom text-cyan-400"></i> 馬格努斯效應
+                    </h2>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        當足球在空中旋轉飛過時，其兩側的空氣流速會產生不對稱性。旋轉方向與空氣氣流一致的一側，流速較快，根據<strong>白努利定律</strong>，流速快處壓力小；相反的一側則流體壓力大。這股壓力差會將足球向流速快的那側推擠，從而形成美麗的<strong>香蕉球（彎曲弧線球）</strong>！
+                    </p>
+                </div>
+
+                <div class="bg-slate-800/60 border border-cyan-500/20 p-6 rounded-3xl shadow-xl">
+                    <h3 class="text-lg font-bold mb-3 text-cyan-300 flex items-center gap-2">
+                        <i class="fa-solid fa-bolt-lightning"></i> 衝量定理與碰撞
+                    </h3>
+                    <div class="space-y-3 text-sm text-slate-300">
+                        <p>
+                            當腳踏擊足球時，能量會在極短時間內（約 8-15 毫秒）進行轉移。這是一次<strong>非完全彈性碰撞</strong>。
+                        </p>
+                        <div class="bg-slate-950 p-3 rounded-xl border border-cyan-500/10 font-mono text-center text-cyan-400">
+                            F · Δt = Δp = m · Δv
+                        </div>
+                        <p class="text-xs text-slate-400">
+                            腳底踢擊的力道與觸球接觸時間決定了足球的初速度。這也是弧線球與變向盤帶的核心力學。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右側力學互動實驗區 -->
+            <div class="lg:col-span-7 bg-slate-800/40 border border-cyan-500/20 p-6 rounded-3xl shadow-xl flex flex-col gap-6">
+                <div>
+                    <h3 class="text-xl font-black text-white flex items-center gap-2">
+                        <i class="fa-solid fa-vial-circle-check text-cyan-400"></i> 香蕉球軌跡模擬實驗
+                    </h3>
+                    <p class="text-xs text-slate-400 mt-1">手動調整自旋度，探索氣流與偏向角度的物理關係</p>
+                </div>
+
+                <!-- 模擬畫布區域 -->
+                <div class="bg-slate-950 w-full aspect-[2/1] rounded-2xl relative border border-cyan-500/10 overflow-hidden flex items-center justify-center">
+                    <canvas id="physics-canvas" class="w-full h-full"></canvas>
+                    <div class="absolute top-3 left-3 bg-slate-900/80 px-2.5 py-1 rounded-md text-[10px] font-mono border border-cyan-500/20 flex items-center gap-1.5 text-cyan-400">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                        即時模擬器
+                    </div>
+                </div>
+
+                <!-- 物理控制滑桿 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-slate-900 p-4 rounded-xl border border-cyan-500/10">
+                        <label class="text-xs font-bold text-slate-400 block mb-2 flex justify-between">
+                            <span>⚽ 自旋速率 (旋轉強度)</span>
+                            <span id="spin-val" class="text-cyan-400 font-mono">0 RPM</span>
+                        </label>
+                        <input type="range" id="spin-slider" min="-100" max="100" value="45" class="w-full accent-cyan-500 bg-slate-800">
+                    </div>
+                    <div class="bg-slate-900 p-4 rounded-xl border border-cyan-500/10">
+                        <label class="text-xs font-bold text-slate-400 block mb-2 flex justify-between">
+                            <span>🚀 射門初速度 (力道)</span>
+                            <span id="speed-val" class="text-cyan-400 font-mono">80 km/h</span>
+                        </label>
+                        <input type="range" id="speed-slider" min="40" max="120" value="80" class="w-full accent-cyan-500 bg-slate-800">
+                    </div>
+                </div>
+
+                <div class="bg-cyan-950/20 border border-cyan-500/20 p-4 rounded-2xl flex items-start gap-3">
+                    <i class="fa-solid fa-lightbulb text-cyan-400 text-lg mt-0.5"></i>
+                    <p class="text-xs text-cyan-300 leading-relaxed">
+                        <strong>物理原理：</strong> 當您調整為「正自旋」時，球會在空中向右急劇拐彎；調整為「負自旋」則向左。若自旋歸零，球將保持直線彈道。這正是電梯球（不旋轉）左右飄忽不定而難以預測的物理成因！
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 主區塊：運動健康 -->
+    <div id="tab-health" class="tab-content hidden min-h-[calc(100vh-4rem)] bg-slate-900 p-4 sm:p-8">
+        <div class="max-w-6xl mx-auto flex flex-col gap-8">
+            
+            <!-- 上方橫幅 -->
+            <div class="bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-800 p-6 sm:p-10 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div>
+                    <span class="bg-white/10 text-cyan-300 font-bold text-xs px-3 py-1 rounded-full uppercase tracking-widest border border-cyan-500/20">Athlete Fitness Guide</span>
+                    <h2 class="text-3xl font-black mt-2 text-white">體能與膳食科學指南</h2>
+                    <p class="text-sm text-slate-200 mt-1 max-w-xl">
+                        要維持像頂尖選手一樣靈活敏捷的球風與驚人的無氧爆發力，科學化的飲食管理、核心肌群特訓與預防性防護缺一不可。
+                    </p>
+                </div>
+                <div class="flex gap-4">
+                    <span class="p-4 bg-slate-900/40 backdrop-blur-md rounded-2xl text-center border border-cyan-500/20">
+                        <div class="text-xl font-bold text-cyan-300">65%</div>
+                        <div class="text-[10px] text-slate-300">糖原能量配比</div>
+                    </span>
+                    <span class="p-4 bg-slate-900/40 backdrop-blur-md rounded-2xl text-center border border-cyan-500/20">
+                        <div class="text-xl font-bold text-cyan-300">2.5L+</div>
+                        <div class="text-[10px] text-slate-300">每日基本補水</div>
+                    </span>
+                </div>
+            </div>
+
+            <!-- 三大體能核心 -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- 卡片 1：營養膳食 -->
+                <div class="bg-slate-800/60 border border-cyan-500/15 p-6 rounded-3xl shadow-xl hover:-translate-y-1 transition-transform duration-200">
+                    <div class="w-12 h-12 bg-cyan-500/10 rounded-2xl flex items-center justify-center text-cyan-400 text-xl mb-4">
+                        <i class="fa-solid fa-carrot"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-3 text-white">黃金能量飲食配比</h3>
+                    <ul class="space-y-3 text-sm text-slate-300">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-cyan-400 mt-1"></i>
+                            <span><strong>優質碳水化合物：</strong> 比賽前 3 小時補給低 GI 燕麥、全麥意麵，補足肌糖原儲備。</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-cyan-400 mt-1"></i>
+                            <span><strong>電解質補充：</strong> 劇烈排汗時需定時定量補水與鈉離子，以防發生小腿抽筋。</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 卡片 2：核心與敏捷訓練 -->
+                <div class="bg-slate-800/60 border border-cyan-500/15 p-6 rounded-3xl shadow-xl hover:-translate-y-1 transition-transform duration-200">
+                    <div class="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-400 text-xl mb-4">
+                        <i class="fa-solid fa-dumbbell"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-3 text-white">下肢與核心功能特訓</h3>
+                    <ul class="space-y-3 text-sm text-slate-300">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-blue-400 mt-1"></i>
+                            <span><strong>快速折返與天梯跑：</strong> 加強踝、膝關節活動度，完美模擬控球時的瞬間變向。</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-blue-400 mt-1"></i>
+                            <span><strong>單腿支撐阻力蹲：</strong> 增強單側大腿肌肉與臀肌，提升射門瞬間的骨盆穩定性。</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- 卡片 3：防護與冷療 -->
+                <div class="bg-slate-800/60 border border-cyan-500/15 p-6 rounded-3xl shadow-xl hover:-translate-y-1 transition-transform duration-200">
+                    <div class="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-400 text-xl mb-4">
+                        <i class="fa-solid fa-kit-medical"></i>
+                    </div>
+                    <h3 class="text-lg font-bold mb-3 text-white">賽後修復與冷療機制</h3>
+                    <ul class="space-y-3 text-sm text-slate-300">
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-indigo-400 mt-1"></i>
+                            <span><strong>動態牽拉與熱身：</strong> 賽前 15 分鐘動態拉伸可顯著提升肌肉彈性，降低韌帶扭傷機率。</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <i class="fa-solid fa-circle-check text-indigo-400 mt-1"></i>
+                            <span><strong>冷療與冰水浴：</strong> 比賽或訓練後進行冷浴，收縮微血管，大幅緩解延遲性肌肉酸痛。</span>
+                        </li>
+                    </ul>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 主區塊：大師測驗 -->
+    <div id="tab-quiz" class="tab-content hidden min-h-[calc(100vh-4rem)] bg-slate-900 p-4 sm:p-8">
+        <div class="max-w-3xl mx-auto">
+            
+            <div class="text-center mb-8">
+                <span class="text-xs font-black tracking-widest text-cyan-400 uppercase">Knowledge Assessment</span>
+                <h2 class="text-3xl font-black text-white mt-1">⚽ 足球力學與健康評量測驗</h2>
+                <p class="text-sm text-slate-400 mt-2">完成 5 題測驗，證明你已掌握足球大師的物理密碼與健康知識！</p>
+            </div>
+
+            <!-- 測驗卡片 -->
+            <div class="bg-slate-800/80 border-2 border-cyan-500/20 p-6 sm:p-8 rounded-3xl shadow-2xl relative">
+                
+                <!-- 測驗進度條 -->
+                <div class="w-full bg-slate-700 h-2 rounded-full overflow-hidden mb-6 flex">
+                    <div id="quiz-progress" class="bg-cyan-500 h-full transition-all duration-300" style="width: 20%;"></div>
+                </div>
+
+                <!-- 題目內容 -->
+                <div class="mb-6">
+                    <span id="quiz-badge" class="bg-cyan-500/20 text-cyan-400 font-bold text-xs px-3 py-1 rounded-md">第 1 題 / 共 5 題</span>
+                    <h3 id="quiz-question" class="text-lg sm:text-xl font-bold mt-3 text-white">載入中...</h3>
+                </div>
+
+                <!-- 選項清單 -->
+                <div id="quiz-options" class="space-y-3 mb-6">
+                    <!-- 動態生成 -->
+                </div>
+
+                <!-- 答案解析說明 -->
+                <div id="quiz-explanation" class="hidden bg-slate-950/70 border border-cyan-500/20 p-4 rounded-xl text-xs sm:text-sm text-slate-300 mb-6">
+                    <!-- 動態填充 -->
+                </div>
+
+                <!-- 按鈕區 -->
+                <div class="flex justify-end">
+                    <button id="quiz-next-btn" class="hidden bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 px-6 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 shadow-md text-white">
+                        下一題 <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                    <button id="quiz-reset-btn" class="hidden bg-cyan-400 hover:bg-cyan-300 text-slate-950 px-6 py-2.5 rounded-xl font-black text-sm transition-all duration-200 shadow-md">
+                        重新挑戰 <i class="fa-solid fa-rotate-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        class SoundEffects {
+            constructor() {
+                this.ctx = null;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            }
+
+            // 踢球聲
+            playKick() {
+                this.init();
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(140, this.ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(35, this.ctx.currentTime + 0.12);
+                
+                gain.gain.setValueAtTime(0.8, this.ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.12);
+                
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                
+                osc.start();
+                osc.stop(this.ctx.currentTime + 0.12);
+            }
+
+            // 進球得分聲
+            playGoal() {
+                this.init();
+                const now = this.ctx.currentTime;
+                
+                const osc1 = this.ctx.createOscillator();
+                const osc2 = this.ctx.createOscillator();
+                const whistleGain = this.ctx.createGain();
+
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(800, now);
+                osc1.frequency.linearRampToValueAtTime(850, now + 0.1);
+                osc1.frequency.linearRampToValueAtTime(800, now + 0.3);
+
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(805, now);
+                osc2.frequency.linearRampToValueAtTime(855, now + 0.1);
+                osc2.frequency.linearRampToValueAtTime(805, now + 0.3);
+
+                whistleGain.gain.setValueAtTime(0.3, now);
+                whistleGain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+
+                osc1.connect(whistleGain);
+                osc2.connect(whistleGain);
+                whistleGain.connect(this.ctx.destination);
+
+                osc1.start();
+                osc2.start();
+                osc1.stop(now + 0.4);
+                osc2.stop(now + 0.4);
+
+                // 歡呼合成音
+                setTimeout(() => {
+                    const bufferSize = this.ctx.sampleRate * 1.0;
+                    const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+                    const data = buffer.getChannelData(0);
+                    for (let i = 0; i < bufferSize; i++) {
+                        data[i] = Math.random() * 2 - 1;
+                    }
+
+                    const noise = this.ctx.createBufferSource();
+                    noise.buffer = buffer;
+
+                    const filter = this.ctx.createBiquadFilter();
+                    filter.type = 'bandpass';
+                    filter.frequency.value = 1100;
+                    filter.Q.value = 1.0;
+
+                    const noiseGain = this.ctx.createGain();
+                    noiseGain.gain.setValueAtTime(0.4, this.ctx.currentTime);
+                    noiseGain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.8);
+
+                    noise.connect(filter);
+                    filter.connect(noiseGain);
+                    noiseGain.connect(this.ctx.destination);
+
+                    noise.start();
+                    noise.stop(this.ctx.currentTime + 1.0);
+                }, 50);
+            }
+
+            // 打鐵沒進球
+            playMiss() {
+                this.init();
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.linearRampToValueAtTime(90, now + 0.25);
+                
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                
+                osc.start();
+                osc.stop(now + 0.25);
+            }
+
+            // 選項答對
+            playCorrect() {
+                this.init();
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now); 
+                osc.frequency.setValueAtTime(659.25, now + 0.1); 
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(now + 0.3);
+            }
+
+            // 選項答錯
+            playWrong() {
+                this.init();
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now); 
+                osc.frequency.linearRampToValueAtTime(110, now + 0.2);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start();
+                osc.stop(now + 0.25);
+            }
+        }
+
+        const sfx = new SoundEffects();
+    </script>
+
+    <script>
+        function switchTab(tabId) {
+            // 隱藏所有分頁
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden');
+            });
+            // 顯示選中分頁
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+
+            // 重置導覽鈕樣式
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn px-2 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-bold rounded-xl transition-all duration-200 text-slate-400 hover:text-white hover:bg-white/5";
+            });
+            const activeBtn = document.getElementById(`nav-${tabId}`);
+            activeBtn.className = "nav-btn px-2 py-1.5 md:px-4 md:py-2 text-xs md:text-sm font-bold rounded-xl transition-all duration-200 bg-cyan-600 text-white shadow-md shadow-cyan-500/20";
+            
+            if (tabId === 'physics') {
+                initPhysicsCanvas();
+            }
+        }
+    </script>
+
+    <script>
+        const boy = document.getElementById('soccer-boy');
+        const ball = document.getElementById('active-ball');
+        const goalpost = document.getElementById('goalpost');
+        const scoreEl = document.getElementById('score');
+        const shotsEl = document.getElementById('shots');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const feedbackText = document.getElementById('feedback-text');
+        
+        const leftLeg = document.getElementById('left-leg');
+        const rightLeg = document.getElementById('right-leg');
+        const leftArm = document.getElementById('left-arm');
+        const rightArm = document.getElementById('right-arm');
+        const bodyWrapper = document.getElementById('boy-body-wrapper');
+
+        let score = 0;
+        let shots = 0;
+        
+        // 人物物理與慣性滑動參數
+        let boyX = 50; 
+        let boyY = 70; 
+        let boyVx = 0; // X軸當前速度
+        let boyVy = 0; // Y軸當前速度
+        const accel = 0.08;      // 跑動加速度
+        const friction = 0.84;   // 阻尼摩擦力
+        const maxSpeed = 0.58;   // 最大跑動速度
+        let faceDirection = 1; 
+
+        let ballX = 55; 
+        let ballY = 58; 
+        let ballTargetX = 55;
+        let ballTargetY = 55;
+        let ballStartX = 55;
+        let ballStartY = 55;
+        let ballFlightProgress = 1; 
+        let ballFlightDuration = 32; // 精準調校射門飛越速度
+        let ballArcHeight = 13; 
+        
+        const keys = {};
+
+        const goalWords = ["世界波！", "破網得分！", "完美弧線！", "直掛死角！", "梅西黃金左腳！"];
+        const missWords = ["擦柱而出！", "高出橫樑！", "差了一點！", "偏出立柱！", "門將穩穩沒收！"];
+
+        window.addEventListener('keydown', (e) => {
+            keys[e.code] = true;
+            keys[e.key] = true;
+            if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+                e.preventDefault();
+            }
+        });
+        window.addEventListener('keyup', (e) => {
+            keys[e.code] = false;
+            keys[e.key] = false;
+        });
+
+        // 螢幕虛擬搖桿
+        const joystickZone = document.getElementById('joystick-zone');
+        const joystickKnob = document.getElementById('joystick-knob');
+        let joystickActive = false;
+        let joystickX = 0;
+        let joystickY = 0;
+
+        joystickZone.addEventListener('pointerdown', (e) => {
+            joystickActive = true;
+            joystickZone.setPointerCapture(e.pointerId);
+            handleJoystickMove(e);
+            sfx.init();
+        });
+
+        joystickZone.addEventListener('pointermove', (e) => {
+            if (!joystickActive) return;
+            handleJoystickMove(e);
+        });
+
+        joystickZone.addEventListener('pointerup', () => {
+            joystickActive = false;
+            joystickX = 0;
+            joystickY = 0;
+            joystickKnob.style.transform = `translate(0px, 0px)`;
+        });
+
+        function handleJoystickMove(e) {
+            const rect = joystickZone.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            let dx = e.clientX - centerX;
+            let dy = e.clientY - centerY;
+            const distance = Math.min(rect.width / 2, Math.hypot(dx, dy));
+            const angle = Math.atan2(dy, dx);
+
+            joystickX = Math.cos(angle) * (distance / (rect.width / 2));
+            joystickY = Math.sin(angle) * (distance / (rect.width / 2));
+
+            const knobX = Math.cos(angle) * distance;
+            const knobY = Math.sin(angle) * distance;
+            joystickKnob.style.transform = `translate(${knobX}px, ${knobY}px)`;
+        }
+
+        // 射門事件
+        function triggerKick() {
+            if (ballFlightProgress < 1) return; 
+
+            shots++;
+            shotsEl.textContent = shots;
+            sfx.playKick();
+
+            // 擺動雙手雙腳射門動畫
+            bodyWrapper.classList.add('kick-anim');
+            setTimeout(() => bodyWrapper.classList.remove('kick-anim'), 400);
+
+            // 75% 命中率
+            const isGoal = Math.random() < 0.75;
+            
+            const goalRect = goalpost.getBoundingClientRect();
+            const fieldRect = document.getElementById('tab-pitch').getBoundingClientRect();
+
+            const goalLeftPercent = ((goalRect.left - fieldRect.left) / fieldRect.width) * 100;
+            const goalRightPercent = ((goalRect.right - fieldRect.left) / fieldRect.width) * 100;
+            const goalTopPercent = ((goalRect.top - fieldRect.top) / fieldRect.height) * 100;
+            const goalBottomPercent = ((goalRect.bottom - fieldRect.top) / fieldRect.height) * 100;
+
+            ballStartX = ballX;
+            ballStartY = ballY;
+
+            if (isGoal) {
+                const targetRange = (goalRightPercent - goalLeftPercent);
+                ballTargetX = goalLeftPercent + targetRange * 0.15 + (Math.random() * targetRange * 0.7);
+                ballTargetY = goalTopPercent + (goalBottomPercent - goalTopPercent) * 0.35;
+            } else {
+                if (Math.random() < 0.5) {
+                    ballTargetX = goalLeftPercent - 4 - (Math.random() * 6);
+                } else {
+                    ballTargetX = goalRightPercent + 4 + (Math.random() * 6);
+                }
+                ballTargetY = goalTopPercent - (Math.random() * 6);
+            }
+
+            ballFlightProgress = 0;
+
+            setTimeout(() => {
+                if (isGoal) {
+                    score++;
+                    scoreEl.textContent = score;
+                    scoreEl.classList.add('scale-125', 'text-cyan-400');
+                    setTimeout(() => scoreEl.classList.remove('scale-125', 'text-cyan-400'), 250);
+
+                    createGoalParticles();
+                    showFeedback(goalWords[Math.floor(Math.random() * goalWords.length)], 'text-cyan-400', true);
+                    sfx.playGoal();
+                } else {
+                    showFeedback(missWords[Math.floor(Math.random() * missWords.length)], 'text-slate-400', false);
+                    sfx.playMiss();
+                }
+            }, ballFlightDuration * 16 * 0.75); 
+        }
+
+        function showFeedback(text, colorClass, isSuccess) {
+            feedbackText.textContent = text;
+            feedbackText.className = `text-2xl sm:text-5xl font-black tracking-widest drop-shadow-[0_4px_8px_rgba(6,182,212,0.6)] ${colorClass}`;
+            feedbackText.classList.add('text-active');
+            feedbackContainer.style.opacity = '1';
+
+            setTimeout(() => {
+                feedbackContainer.style.opacity = '0';
+                feedbackText.classList.remove('text-active');
+            }, 1100);
+        }
+
+        // 冷色調慶祝碎屑
+        function createGoalParticles() {
+            const colors = ['#06b6d4', '#0891b2', '#22d3ee', '#3b82f6', '#6366f1', '#e2e8f0'];
+            const pitchDiv = document.getElementById('tab-pitch');
+            for (let i = 0; i < 35; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const size = Math.random() * 6 + 4;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                particle.style.left = `${window.innerWidth / 2 + (Math.random() * 200 - 100)}px`;
+                particle.style.top = `${window.innerHeight * 0.25 + (Math.random() * 60 - 30)}px`;
+                
+                const xVal = (Math.random() - 0.5) * 300;
+                const yVal = (Math.random() - 0.5) * 160 - 80;
+                particle.style.setProperty('--x', `${xVal}px`);
+                particle.style.setProperty('--y', `${yVal}px`);
+                
+                pitchDiv.appendChild(particle);
+                setTimeout(() => particle.remove(), 800);
+            }
+        }
+
+        let stepCount = 0;
+
+        function updateGame() {
+            if (document.getElementById('tab-pitch').classList.contains('hidden')) {
+                requestAnimationFrame(updateGame);
+                return;
+            }
+
+            // 輸入向量
+            let inputX = 0;
+            let inputY = 0;
+
+            if (keys['ArrowLeft'] || keys['KeyA'] || keys['a']) inputX = -1;
+            if (keys['ArrowRight'] || keys['KeyD'] || keys['d']) inputX = 1;
+            if (keys['ArrowUp'] || keys['KeyW'] || keys['w']) inputY = -1;
+            if (keys['ArrowDown'] || keys['KeyS'] || keys['s']) inputY = 1;
+
+            if (joystickActive) {
+                inputX = joystickX;
+                inputY = joystickY;
+            }
+
+            // 歸一化輸入
+            if (inputX !== 0 && inputY !== 0) {
+                const length = Math.hypot(inputX, inputY);
+                inputX /= length;
+                inputY /= length;
+            }
+
+            // 速度累加與阻尼
+            boyVx += inputX * accel;
+            boyVy += inputY * accel;
+
+            // 速度上限
+            const currentSpeed = Math.hypot(boyVx, boyVy);
+            if (currentSpeed > maxSpeed) {
+                boyVx = (boyVx / currentSpeed) * maxSpeed;
+                boyVy = (boyVy / currentSpeed) * maxSpeed;
+            }
+
+            // 摩擦力衰減
+            boyVx *= friction;
+            boyVy *= friction;
+
+            // 微小速度歸零
+            if (Math.abs(boyVx) < 0.005) boyVx = 0;
+            if (Math.abs(boyVy) < 0.005) boyVy = 0;
+
+            // 更新座標位置
+            boyX += boyVx;
+            boyY += boyVy;
+
+            boyX = Math.max(5, Math.min(95, boyX));
+            boyY = Math.max(28, Math.min(92, boyY));
+
+            const isMoving = Math.abs(boyVx) > 0.02 || Math.abs(boyVy) > 0.02;
+
+            if (isMoving) {
+                if (boyVx < -0.05) faceDirection = -1;
+                if (boyVx > 0.05) faceDirection = 1;
+
+                stepCount += 0.22; // 動畫撥放速度
+                
+                // 動漫風格跑動：健全雙腿大跨步交替
+                leftLeg.style.transform = `rotate(${Math.sin(stepCount) * 42}deg)`;
+                rightLeg.style.transform = `rotate(${-Math.sin(stepCount) * 42}deg)`;
+                
+                // 健全雙臂自然前後協調擺動 (手臂跟衣服脫鉤，擺動幅度完全外展、毫無裁切，看得一清二楚)
+                leftArm.style.transform = `rotate(${-Math.sin(stepCount) * 48}deg)`;
+                rightArm.style.transform = `rotate(${Math.sin(stepCount) * 48}deg)`;
+                
+                bodyWrapper.style.transform = `translateY(${Math.abs(Math.sin(stepCount)) * -4}px)`;
+            } else {
+                leftLeg.style.transform = 'rotate(0deg)';
+                rightLeg.style.transform = 'rotate(0deg)';
+                leftArm.style.transform = 'rotate(-12deg)';
+                rightArm.style.transform = 'rotate(12deg)';
+                bodyWrapper.style.transform = 'translateY(0px)';
+            }
+
+            boy.style.left = `${boyX}%`;
+            boy.style.top = `${boyY}%`;
+            boy.style.transform = `translate(-50%, -100%) scaleX(${faceDirection})`;
+
+            // 足球運動學
+            if (ballFlightProgress < 1) {
+                ballFlightProgress += 1 / ballFlightDuration;
+                if (ballFlightProgress >= 1) {
+                    ballFlightProgress = 1;
+                    
+                    // 球隨機重置
+                    setTimeout(() => {
+                        ballX = 25 + Math.random() * 50;
+                        ballY = 55 + Math.random() * 30;
+                    }, 400);
+                }
+
+                const currentBallX = ballStartX + (ballTargetX - ballStartX) * ballFlightProgress;
+                const currentBallY = ballStartY + (ballTargetY - ballStartY) * ballFlightProgress;
+                const arcY = -4 * ballArcHeight * ballFlightProgress * (1 - ballFlightProgress);
+                
+                ball.style.left = `${currentBallX}%`;
+                ball.style.top = `${currentBallY + arcY}%`;
+                const scale = 1.1 - ballFlightProgress * 0.65; 
+                ball.style.transform = `translate(-50%, -50%) scale(${scale}) rotate(${ballFlightProgress * 1440}deg)`;
+            } else {
+                ball.style.left = `${ballX}%`;
+                ball.style.top = `${ballY}%`;
+                ball.style.transform = `translate(-50%, -50%) scale(1.1) rotate(0deg)`;
+
+                // 碰撞檢測 (精準帶球碰撞)
+                const dx = boyX - ballX;
+                const dy = (boyY - 2) - ballY; 
+                const distance = Math.hypot(dx, dy);
+
+                if (distance < 4.2) {
+                    triggerKick();
+                }
+            }
+
+            requestAnimationFrame(updateGame);
+        }
+
+        window.onload = function() {
+            requestAnimationFrame(updateGame);
+            initPhysicsCanvas();
+        };
+
+        window.addEventListener('touchstart', () => sfx.init(), { once: true });
+        window.addEventListener('click', () => sfx.init(), { once: true });
+    </script>
+
+    <script>
+        const canvas = document.getElementById('physics-canvas');
+        const ctx = canvas.getContext('2d');
+        const spinSlider = document.getElementById('spin-slider');
+        const speedSlider = document.getElementById('speed-slider');
+        const spinValText = document.getElementById('spin-val');
+        const speedValText = document.getElementById('speed-val');
+
+        function initPhysicsCanvas() {
+            const dpr = window.devicePixelRatio || 1;
+            const rect = canvas.getBoundingClientRect();
+            canvas.width = rect.width * dpr;
+            canvas.height = rect.height * dpr;
+            ctx.scale(dpr, dpr);
+
+            drawPhysicsDemo();
+        }
+
+        function drawPhysicsDemo() {
+            const width = canvas.width / (window.devicePixelRatio || 1);
+            const height = canvas.height / (window.devicePixelRatio || 1);
+            ctx.clearRect(0, 0, width, height);
+
+            // 畫起跑點和球門界線
+            ctx.strokeStyle = 'rgba(6, 182, 212, 0.1)';
+            ctx.lineWidth = 1.5;
+            ctx.strokeRect(20, 20, width - 40, height - 40);
+
+            // 畫球門 (右側，科技藍綠光)
+            ctx.fillStyle = 'rgba(6, 182, 212, 0.2)';
+            ctx.fillRect(width - 35, height/2 - 25, 15, 50);
+            ctx.strokeStyle = '#06b6d4';
+            ctx.lineWidth = 2.5;
+            ctx.strokeRect(width - 35, height/2 - 25, 15, 50);
+
+            // 物理控制讀數
+            const spinValue = parseInt(spinSlider.value); 
+            const speedValue = parseInt(speedSlider.value); 
+
+            spinValText.textContent = `${spinValue * 15} RPM`;
+            speedValText.textContent = `${speedValue} km/h`;
+
+            // 繪製軌跡
+            ctx.beginPath();
+            ctx.strokeStyle = '#06b6d4';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([6, 3]);
+
+            let x = 40;
+            let y = height / 2;
+            let vx = speedValue / 11;
+            let vy = 0;
+            const magnusK = spinValue / 1400; 
+
+            ctx.moveTo(x, y);
+
+            for (let t = 0; t < 100; t++) {
+                const fMagnusX = -vy * magnusK;
+                const fMagnusY = vx * magnusK;
+
+                vx += fMagnusX;
+                vy += fMagnusY;
+
+                x += vx;
+                y += vy;
+
+                if (x > width - 30) break;
+                ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // 繪製科技氣流箭頭示意
+            ctx.fillStyle = 'rgba(34, 211, 238, 0.5)';
+            ctx.font = '10px monospace';
+            ctx.fillText("💨 空氣流向 (白努利不對稱)", 40, 30);
+
+            // 繪製足球
+            drawSoccerBallIcon(width - 70, height / 2 + (spinValue * 0.35), spinValue);
+        }
+
+        function drawSoccerBallIcon(cx, cy, spin) {
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(Date.now() * 0.005 * (spin / 100));
+            
+            ctx.beginPath();
+            ctx.arc(0, 0, 11, 0, Math.PI * 2);
+            ctx.fillStyle = '#f8fafc';
+            ctx.fill();
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+
+            ctx.fillStyle = '#0891b2';
+            ctx.beginPath();
+            ctx.arc(0, 0, 4, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        spinSlider.addEventListener('input', drawPhysicsDemo);
+        speedSlider.addEventListener('input', drawPhysicsDemo);
+        window.addEventListener('resize', initPhysicsCanvas);
+    </script>
+
+    <script>
+        const quizData = [
+            {
+                question: "1. 足球在空中一邊旋轉一邊前進時產生彎曲弧線，這主要屬於哪種物理現象？",
+                options: [
+                    "重力透鏡效應",
+                    "馬格努斯效應 (白努利定律壓強差)",
+                    "牛頓萬有引力碰撞",
+                    "流體完全停滯效應"
+                ],
+                correct: 1,
+                explanation: "正確答案是：馬格努斯效應。當球在空中高速旋轉時，會造成球兩側氣流速度不一致，導致壓強產生不對稱性，足球將朝流速快、壓強小的那一側偏轉飛行。"
+            },
+            {
+                question: "2. 如果想要踢出難以捉摸、在半空突然急速下墜的「電梯球」（不自旋球），在腳底擊球點上應該如何操作？",
+                options: [
+                    "擊打足球最側邊，使其強烈自轉",
+                    "正腳背大力擊打足球物理正中心，將自旋降至最低",
+                    "用腳尖向上挑球，形成回旋",
+                    "輕拍球面使其在草地上滾動"
+                ],
+                correct: 1,
+                explanation: "正確答案是：正腳背擊打中心點。當球體在無自旋或極低自旋狀態下前進，後方會產生無規則的「卡門渦街」氣流擾動，導致球在空中飄忽不定並在尾段突然墜落。"
+            },
+            {
+                question: "3. 為了讓選手維持持久不衰竭的爆發力，比賽前 3 小時最適宜補充哪一類核心飲食？",
+                options: [
+                    "油脂豐厚、消化時間極長的炸魚排與雞翅",
+                    "複合型優質碳水化合物（如燕麥、全麥意大利麵）以充盈肌糖原",
+                    "冰鎮超低溫水，越冰越好",
+                    "高辣度調味品以刺激血液流速"
+                ],
+                correct: 1,
+                explanation: "正確答案是：複合型優質碳水化合物。其轉化糖分的速率平穩適度，能為肌肉持久提供穩定的糖原儲備，避免賽程中後半段因供能不夠而乏力抽筋。"
+            },
+            {
+                question: "4. 高強度盤帶或激烈拼搶後，肌肉酸痛多是因為微細肌纖維拉傷與炎性積累。此時哪種修復手段最受體能科學推崇？",
+                options: [
+                    "一整天完全躺平、一點都不移動關節",
+                    "進行賽後冷水浴 (Cold Plunge)，迅速收縮微血管以減輕炎症反應",
+                    "馬上大啖多油多辛辣的暖體火鍋",
+                    "直接進行兩百個高強度深蹲"
+                ],
+                correct: 1,
+                explanation: "正確答案是：冷水浴修復。利用冷療收縮微細血管，能抑制炎性因子在微損傷部位的聚集和擴散，對舒緩遲發性肌肉酸痛極有幫助。"
+            },
+            {
+                question: "5. 在動量守恆的角度上，踢球瞬間我們應該如何控制身體部位才能讓球速最大化？",
+                options: [
+                    "踢球瞬間鎖死踝關節，維持腳掌的剛性，減少接觸時能量損耗",
+                    "完全放鬆小腿與踝關節，隨意擺盪",
+                    "刻意縮短大腿擺幅，只用腳趾觸球",
+                    "閉上眼睛、整個人往草地上撲倒"
+                ],
+                correct: 0,
+                explanation: "正確答案是：鎖死踝關節、維持足部剛性。這能讓大腿與小腿加速產生的全部動量更完整、集中地傳遞給球體，大幅提高碰撞轉換效率。"
+            }
+        ];
+
+        let currentQuestionIndex = 0;
+        let quizScore = 0;
+        let answered = false;
+
+        const quizBadge = document.getElementById('quiz-badge');
+        const quizQuestion = document.getElementById('quiz-question');
+        const quizOptions = document.getElementById('quiz-options');
+        const quizExplanation = document.getElementById('quiz-explanation');
+        const quizProgress = document.getElementById('quiz-progress');
+        const quizNextBtn = document.getElementById('quiz-next-btn');
+        const quizResetBtn = document.getElementById('quiz-reset-btn');
+
+        function loadQuestion() {
+            answered = false;
+            quizNextBtn.classList.add('hidden');
+            quizResetBtn.classList.add('hidden');
+            quizExplanation.classList.add('hidden');
+
+            const q = quizData[currentQuestionIndex];
+            quizBadge.textContent = `第 ${currentQuestionIndex + 1} 題 / 共 ${quizData.length} 題`;
+            quizQuestion.textContent = q.question;
+            quizProgress.style.width = `${((currentQuestionIndex + 1) / quizData.length) * 100}%`;
+
+            quizOptions.innerHTML = '';
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left p-4 bg-slate-700/40 hover:bg-slate-700/70 rounded-2xl border border-cyan-500/10 text-sm sm:text-base font-medium transition-all duration-150 flex items-center justify-between";
+                btn.innerHTML = `
+                    <span>${opt}</span>
+                    <i class="fa-regular fa-circle text-slate-500"></i>
+                `;
+                btn.addEventListener('click', () => selectOption(idx, btn));
+                quizOptions.appendChild(btn);
+            });
+        }
+
+        function selectOption(selectedIndex, clickedBtn) {
+            if (answered) return;
+            answered = true;
+
+            const q = quizData[currentQuestionIndex];
+            const allBtns = quizOptions.querySelectorAll('button');
+
+            if (selectedIndex === q.correct) {
+                quizScore++;
+                clickedBtn.className = "w-full text-left p-4 bg-cyan-500/10 border-2 border-cyan-400 rounded-2xl text-cyan-300 font-bold transition-all flex items-center justify-between";
+                clickedBtn.querySelector('i').className = "fa-solid fa-circle-check text-cyan-400";
+                sfx.playCorrect();
+            } else {
+                clickedBtn.className = "w-full text-left p-4 bg-rose-500/15 border-2 border-rose-500 rounded-2xl text-rose-300 font-bold transition-all flex items-center justify-between";
+                clickedBtn.querySelector('i').className = "fa-solid fa-circle-xmark text-rose-500";
+                
+                const correctBtn = allBtns[q.correct];
+                correctBtn.className = "w-full text-left p-4 bg-cyan-500/5 border border-cyan-500/40 rounded-2xl text-cyan-400 transition-all flex items-center justify-between";
+                correctBtn.querySelector('i').className = "fa-solid fa-circle-check text-cyan-400";
+                sfx.playWrong();
+            }
+
+            quizExplanation.innerHTML = `<strong>💡 物理大師解析：</strong> ${q.explanation}`;
+            quizExplanation.classList.remove('hidden');
+
+            if (currentQuestionIndex < quizData.length - 1) {
+                quizNextBtn.classList.remove('hidden');
+            } else {
+                showQuizResult();
+            }
+        }
+
+        function showQuizResult() {
+            quizProgress.style.width = "100%";
+            quizBadge.textContent = "測驗完畢";
+            
+            let medal = "🥉 綠茵初學者";
+            let remark = "繼續加油！多去互動訓練場跑跑位、研究力學教室的物理滑桿吧！";
+            if (quizScore === 5) {
+                medal = "🏆 綠茵傳奇大師";
+                remark = "完美答對！您已完全理解高階足球的空氣動力學與完美膳食調配！";
+            } else if (quizScore >= 3) {
+                medal = "🥈 專業足球健將";
+                remark = "相當優秀！您對物理碰撞力學與運動營養防護有著清晰扎實的認知。";
+            }
+
+            quizQuestion.innerHTML = `
+                <div class="text-center py-6">
+                    <div class="text-5xl mb-4">${medal.split(' ')[0]}</div>
+                    <h4 class="text-2xl font-black text-cyan-400">${medal.split(' ')[1]}</h4>
+                    <p class="text-3xl font-extrabold mt-3 text-white">總得分：${quizScore * 20} / 100 分</p>
+                    <p class="text-sm text-slate-300 mt-4 px-4 leading-relaxed">${remark}</p>
+                </div>
+            `;
+            quizOptions.innerHTML = '';
+            quizResetBtn.classList.remove('hidden');
+        }
+
+        quizNextBtn.addEventListener('click', () => {
+            currentQuestionIndex++;
+            loadQuestion();
+        });
+
+        quizResetBtn.addEventListener('click', () => {
+            currentQuestionIndex = 0;
+            quizScore = 0;
+            loadQuestion();
+        });
+
+        // 啟動測驗
+        loadQuestion();
+    </script>
+</body>
+</html>
