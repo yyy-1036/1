@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ 紙電路實作學習單</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen py-10 px-4">
+    <div class="max-w-lg mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden">
+        <div class="gradient-bg p-8 text-white text-center">
+            <h1 class="text-3xl font-bold">⚡ 紙電路實作</h1>
+            <p class="opacity-80 mt-2">記錄你的電路學習成果</p>
+        </div>
+        
+        <form id="circuitForm" class="p-8 space-y-6">
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">班級 (例如: 101)</label>
+                <input type="text" id="className" placeholder="請輸入班級" required class="w-full p-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-purple-400 outline-none">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">座號</label>
+                    <input type="text" id="seatNumber" placeholder="座號" required class="w-full p-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-purple-400 outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">姓名</label>
+                    <input type="text" id="studentName" placeholder="請輸入姓名" required class="w-full p-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-purple-400 outline-none">
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">LED 顏色</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <label class="flex items-center p-3 border rounded-xl cursor-pointer hover:bg-purple-50"><input type="radio" name="ledColor" value="紅色" class="mr-2" checked> 紅色</label>
+                    <label class="flex items-center p-3 border rounded-xl cursor-pointer hover:bg-purple-50"><input type="radio" name="ledColor" value="綠色" class="mr-2"> 綠色</label>
+                    <label class="flex items-center p-3 border rounded-xl cursor-pointer hover:bg-purple-50"><input type="radio" name="ledColor" value="藍色" class="mr-2"> 藍色</label>
+                    <label class="flex items-center p-3 border rounded-xl cursor-pointer hover:bg-purple-50"><input type="radio" name="ledColor" value="白色" class="mr-2"> 白色</label>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">是否成功發光</label>
+                <div class="flex gap-4">
+                    <label class="flex-1 text-center p-3 border rounded-xl cursor-pointer hover:bg-purple-50"><input type="radio" name="isSuccess" value="是" class="mr-2" checked> 是</label>
+                    <label class="flex-1 text-center p-3 border rounded-xl cursor-pointer hover:bg-purple-50"><input type="radio" name="isSuccess" value="否" class="mr-2"> 否</label>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">困難與反思</label>
+                <textarea id="reflection" rows="3" placeholder="遇到了什麼困難？學到了什麼？" class="w-full p-3 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-purple-400 outline-none"></textarea>
+            </div>
+            
+            <button type="submit" id="submitBtn" class="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:bg-purple-700 transition transform hover:scale-[1.02]">
+                🚀 送出學習單
+            </button>
+        </form>
+        
+        <div id="message" class="hidden p-6 text-center text-green-600 font-bold bg-green-50 rounded-b-3xl">
+            🎉 太棒了！你的學習單已成功送出！
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('circuitForm');
+        // 【重要】請將下方的網址替換成您 Google Apps Script 部署後的網址
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbwN70tWeOkqc1QTg4ILz0AVL5W905gIhK4A19g44L_dpufUkLcsYz8Ye8mw7GHjG1Nleg/exec';
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = document.getElementById('submitBtn');
+            const message = document.getElementById('message');
+            
+            submitBtn.disabled = true;
+            submitBtn.innerText = '傳送中...';
+            
+            const data = {
+                className: document.getElementById('className').value,
+                seatNumber: document.getElementById('seatNumber').value,
+                studentName: document.getElementById('studentName').value,
+                ledColor: document.querySelector('input[name="ledColor"]:checked').value,
+                isSuccess: document.querySelector('input[name="isSuccess"]:checked').value,
+                reflection: document.getElementById('reflection').value
+            };
+
+            try {
+                // 發送請求到 GAS
+                await fetch(GAS_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(data)
+                });
+                
+                message.classList.remove('hidden');
+                form.reset();
+            } catch (err) {
+                alert('發生錯誤，請稍後再試');
+            }
+            submitBtn.disabled = false;
+            submitBtn.innerText = '🚀 送出學習單';
+        });
+    </script>
+</body>
+</html>
